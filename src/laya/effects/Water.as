@@ -1,6 +1,7 @@
 package laya.effects {
 	import laya.display.Graphics;
 	import laya.display.Sprite;
+	import laya.resource.Texture;
 	
 	/**
 	 * ...
@@ -12,34 +13,34 @@ package laya.effects {
 		
 		}
 		
-		public var gridResolution = 20;
-		public var rad = 30;
-		public var maxParticles = 1000;
+		public var gridResolution:int = 20;
+		public var rad:int = 30;
+		public var maxParticles:int = 1000;
 		/* ==== the RAM ==== */
-		public var nBytes;
-		public var buffer;
-		public var particles_x ;
-		public var particles_y;
-		public var particles_pprevx;
-		public var particles_pprevy;
-		public var particles_velx;
-		public var particles_vely;
-		public var particles_vxl;
-		public var particles_vyl;
-		public var particles_q;
+		public var nBytes:int;
+		public var buffer:ArrayBuffer;
+		public var particles_x:Float32Array ;
+		public var particles_y:Float32Array;
+		public var particles_pprevx:Float32Array;
+		public var particles_pprevy:Float32Array;
+		public var particles_velx:Float32Array;
+		public var particles_vely:Float32Array;
+		public var particles_vxl:Float32Array;
+		public var particles_vyl:Float32Array;
+		public var particles_q:Float32Array;
 		public var grid = [];
 		public var neighbors = [];
 		public var nParticles = 0;
 		// ==== screen ====
 		
-		public var nbX;
-		public var nbY;
+		public var nbX:int;
+		public var nbY:int;
 		
 		public var worldWidth:int;
 		public var worldHeight:int;
 		
-		var r1 = rad * 1.5;
-		var r2 = r1 * 0.15;
+		var r1:Number = rad * 1.5;
+		var r2:Number = r1 * 0.15;
 		
 		public function init(worldWidth:int, worldHeight:int, count:int = 1000):void {
 			this.worldWidth = worldWidth;
@@ -68,19 +69,15 @@ package laya.effects {
 			particles_q = new Float32Array(buffer, 8 * nBytes, maxParticles);
 		}
 		
-		// ==== cell constructor ====
-		public function Cell() {
-			this.len = 0;
-			this.neighborsParticles = [];
-		}
+
 		
 		// ==== create image particle ====
 		
 		public function pass1(n) {
-			var px = particles_x[n];
-			var py = particles_y[n];
+			var px:int = particles_x[n];
+			var py:int = particles_y[n];
 			// ==== maintain spatial hashing grid ====
-			var g = grid[((0.5 + py / gridResolution) | 0) * nbX + ((0.5 + px / gridResolution) | 0)];
+			var g:Cell = grid[((0.5 + py / gridResolution) | 0) * nbX + ((0.5 + px / gridResolution) | 0)];
 			g.neighborsParticles[g.len++] = n;
 			// ==== mouse pressed ====
 			if (true) {
@@ -88,12 +85,23 @@ package laya.effects {
 				var vy = py - this.mouseY;
 				var vlen = Math.sqrt(vx * vx + vy * vy);
 				if (vlen >= 1 && vlen < 80) {
-					particles_velx[n] += 0.5 * rad * (vx / vlen) / vlen;
-					particles_vely[n] += 0.5 * rad * (vy / vlen) / vlen;
+					//particles_velx[n] -= 0.5 * rad * (vx / vlen) / vlen;
+					//particles_vely[n] -= 0.5 * rad * (vy / vlen) / vlen;
+					//particles_vely[n] -= 0.5 * rad * (vx / vlen) / vlen;
+					//particles_velx[n] -= 0.5 * rad * (vy / vlen) / vlen;
+					particles_vely[n] -= 4*gravityY;
+					particles_velx[n] -= 4*gravityX;
+				}
+				if(vlen>80&&vlen<120)
+				{
+					vlen=60
+					//particles_velx[n] += 0.5 * rad * (vx / vlen) / vlen;
+					//particles_vely[n] += 0.5 * rad * (vy / vlen) / vlen;
 				}
 			}
 			// ==== apply gravity ====
-			particles_vely[n] += 0.01;
+			particles_vely[n] += gravityY;
+			particles_velx[n] += gravityX;
 			// ==== save previous position ====
 			particles_pprevx[n] = px;
 			particles_pprevy[n] = py;
@@ -101,30 +109,31 @@ package laya.effects {
 			particles_x[n] += particles_velx[n];
 			particles_y[n] += particles_vely[n];
 		}
-		
+		public var gravityY:Number = 0.01;
+		public var gravityX:Number = 0.05;
 		// ==== Double Density Relaxation Algorithm ====
 		public function pass2(n) {
-			var px = particles_x[n];
-			var py = particles_y[n];
-			var pressure = 0, presnear = 0, nl = 0;
+			var px:Number = particles_x[n];
+			var py:Number = particles_y[n];
+			var pressure :Number= 0, presnear:Number = 0, nl:Number = 0;
 			// ----- get grid position -----
-			var xc = (0.5 + px / gridResolution) | 0;
-			var yc = (0.5 + py / gridResolution) | 0;
+			var xc:Number = (0.5 + px / gridResolution) | 0;
+			var yc:Number = (0.5 + py / gridResolution) | 0;
 			// ----- 3 x 3 grid cells -----
-			for (var xd = -1; xd < 2; xd++) {
-				for (var yd = -1; yd < 2; yd++) {
-					var h = grid[(yc + yd) * nbX + (xc + xd)];
+			for (var xd:int = -1; xd < 2; xd++) {
+				for (var yd:int = -1; yd < 2; yd++) {
+					var h:Cell = grid[(yc + yd) * nbX + (xc + xd)];
 					if (h && h.len) {
 						// ==== for each neighbours pair ====
 						for (var a = 0, l = h.len; a < l; a++) {
 							var pn = h.neighborsParticles[a];
 							if (pn != n) {
-								var vx = particles_x[pn] - px;
-								var vy = particles_y[pn] - py;
-								var vlen = Math.sqrt(vx * vx + vy * vy);
+								var vx:Number = particles_x[pn] - px;
+								var vy:Number = particles_y[pn] - py;
+								var vlen:Number = Math.sqrt(vx * vx + vy * vy);
 								if (vlen < rad) {
 									// ==== compute density and near-density ====
-									var q = 1 - (vlen / rad);
+									var q:Number = 1 - (vlen / rad);
 									pressure += q * q; // quadratic spike
 									presnear += q * q * q; // cubic spike
 									particles_q[pn] = q;
@@ -138,20 +147,21 @@ package laya.effects {
 				}
 			}
 			// ==== screen limits ====
+			var q:Number;
 			if (px < r2) {
-				var q = 1 - Math.abs(px / r2);
+				q = 1 - Math.abs(px / r2);
 				particles_x[n] += q * q * 0.5;
 			}
 			else if (px > worldWidth - r2) {
-				var q = 1 - Math.abs((worldWidth - px) / r2);
+				q = 1 - Math.abs((worldWidth - px) / r2);
 				particles_x[n] -= q * q * 0.5;
 			}
 			if (py < r2) {
-				var q = 1 - Math.abs(py / r2);
+				q = 1 - Math.abs(py / r2);
 				particles_y[n] += q * q * 0.5;
 			}
 			else if (py > worldHeight - r2) {
-				var q = 1 - Math.abs((worldHeight - py) / r2);
+				q = 1 - Math.abs((worldHeight - py) / r2);
 				particles_y[n] -= q * q * 0.5;
 			}
 			if (px < r2)
@@ -165,12 +175,12 @@ package laya.effects {
 			// ==== second pass of the relaxation ====
 			pressure = (pressure - 3) * 0.5;
 			presnear *= 0.5;
-			for (var a = 0; a < nl; a++) {
-				var np = neighbors[a];
+			for (var a:int = 0; a < nl; a++) {
+				var np:int = neighbors[a];
 				// ==== apply displacements ====
-				var p = pressure + presnear * particles_q[np];
-				var dx = (particles_vxl[np] * p) * 0.5;
-				var dy = (particles_vyl[np] * p) * 0.5;
+				var p:Number = pressure + presnear * particles_q[np];
+				var dx:Number = (particles_vxl[np] * p) * 0.5;
+				var dy:Number = (particles_vyl[np] * p) * 0.5;
 				particles_x[np] += dx;
 				particles_y[np] += dy;
 				particles_x[n] -= dx;
@@ -185,10 +195,10 @@ package laya.effects {
 			// ==== draw particle ====
 			//ctx.drawImage(particleImage, particles_x[n] - r1, particles_y[n] - r1);
 		}
-		
+		public var tex:Texture;
 		// ==== main loop ====
 		public function run() {
-			var i, l;
+			var i:int, l:int;
 			// ==== inject new particles ====
 			if (nParticles < maxParticles) {
 				particles_x[nParticles] = 0.5 * worldWidth + Math.random();
@@ -209,10 +219,11 @@ package laya.effects {
 			
 			var g:Graphics = this.graphics;
 			g.clear();
-			var i:int, len:int;
+			var len:int;
 			len = nParticles;
 			for (i = 0; i < len; i++) {
-				g.drawCircle(particles_x[i] - r1, particles_y[i] - r1, 5, "#ff0000");
+				//g.drawCircle(particles_x[i] - r1, particles_y[i] - r1, 5, "#ff0000");
+				g.drawTexture(tex, particles_x[i] - r1, particles_y[i] - r1);
 			}
 		}
 	}

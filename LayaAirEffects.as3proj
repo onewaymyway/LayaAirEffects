@@ -18,6 +18,7 @@
     <class path="src" />
     <class path="..\..\..\codes\laya\libs\LayaAir\core\src" />
     <class path="..\..\..\codes\laya\libs\LayaAir\core\jsc" />
+    <class path="..\..\..\codes\laya\libs\LayaAir\webGL\src" />
   </classpaths>
   <!-- Build options -->
   <build>
