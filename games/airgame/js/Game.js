@@ -40,6 +40,19 @@ var Game = (function () {
     Game.prototype.serviceWorkerInited = function () {
         this.info.text = "WorkerLoaderEnabled:" + Laya.WorkerLoader.workerSupported();
         this.info.text += "\nServiceWorkerEnabled:" + Laya.ServiceWorkerTools.I.workerEnabled;
+        try {
+            new Laya.Browser.window.ImageData(22, 22);
+            this.info.text += "\nImageData:" + true;
+        }
+        catch (e) {
+            this.info.text += "\nImageData:" + false;
+        }
+        if (Laya.Browser.window.createImageBitmap) {
+            this.info.text += "\ncreateImageBitmap:" + true;
+        }
+        else {
+            this.info.text += "\ncreateImageBitmap:" + false;
+        }
         //加载图集资源
         Laya.loader.load("res/atlas/war.json", Laya.Handler.create(this, this.onLoaded), null, Laya.Loader.ATLAS);
     };
