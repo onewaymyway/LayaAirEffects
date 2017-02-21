@@ -12059,6 +12059,10 @@ var Laya=window.Laya=(function(window,document){
 			return true;
 		}
 
+		WorkerLoader.workerSupported=function(){
+			return Browser.window.Worker?true:false;
+		}
+
 		WorkerLoader.IMAGE_LOADED="image_loaded";
 		WorkerLoader.IMAGE_ERR="image_err";
 		WorkerLoader.IMAGE_MSG="image_msg";
@@ -13001,6 +13005,7 @@ var Laya=window.Laya=(function(window,document){
 	var ServiceWorkerTools=(function(_super){
 		function ServiceWorkerTools(){
 			this.messageChannel=null;
+			this._tWorker=null;
 			this._workDoneHandler=null;
 			ServiceWorkerTools.__super.call(this);
 			var _$this=this;
@@ -13062,6 +13067,7 @@ var Laya=window.Laya=(function(window,document){
 			var navigator=Browser.window.navigator;
 			if ('serviceWorker' in navigator){
 				navigator.serviceWorker.register(workerPath,option).then(function(worker){
+					_$this._tWorker=worker;
 					if (worker && forceUpdate){}
 						if (navigator.serviceWorker.controller){
 						_$this._traceWorkInfo('service worker is working');
@@ -13087,6 +13093,10 @@ var Laya=window.Laya=(function(window,document){
 				this._workDoneCall();
 			}
 		}
+
+		__getset(0,__proto,'workerEnabled',function(){
+			return this._tWorker?true:false;
+		});
 
 		__getset(1,ServiceWorkerTools,'isServiceWorkerSupport',function(){
 			return 'serviceWorker' in Browser.window.navigator;

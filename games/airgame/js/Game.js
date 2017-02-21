@@ -17,6 +17,11 @@ var Game = (function () {
         this.radius = [18, 33, 80];
         //初始化引擎，设置游戏设计宽高，并且打开WebGL模式
         Laya.init(480, 852, Laya.WebGL);
+        this.info = new Laya.Label();
+        this.info.fontSize = 20;
+        this.info.zOrder = 999;
+        this.info.pos(100, 100);
+        Laya.stage.addChild(this.info);
         Laya.WorkerLoader.enable = true;
         this.initServiceWorker();
         //设置适配模式
@@ -32,6 +37,8 @@ var Game = (function () {
         Laya.ServiceWorkerTools.I.register(new Laya.Handler(this, this.serviceWorkerInited));
     };
     Game.prototype.serviceWorkerInited = function () {
+        this.info.text = "workerSupported:" + Laya.WorkerLoader.workerSupported();
+        this.info.text += "\nServiceWorkerEnabled:" + Laya.ServiceWorkerTools.I.workerEnabled;
         //加载图集资源
         Laya.loader.load("res/atlas/war.json", Laya.Handler.create(this, this.onLoaded), null, Laya.Loader.ATLAS);
     };
