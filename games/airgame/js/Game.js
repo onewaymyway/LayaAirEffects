@@ -38,7 +38,7 @@ var Game = (function () {
         Laya.ServiceWorkerTools.I.register(new Laya.Handler(this, this.serviceWorkerInited));
     };
     Game.prototype.serviceWorkerInited = function () {
-        this.info.text = "workerSupported:" + Laya.WorkerLoader.workerSupported();
+        this.info.text = "WorkerLoaderEnabled:" + Laya.WorkerLoader.workerSupported();
         this.info.text += "\nServiceWorkerEnabled:" + Laya.ServiceWorkerTools.I.workerEnabled;
         //加载图集资源
         Laya.loader.load("res/atlas/war.json", Laya.Handler.create(this, this.onLoaded), null, Laya.Loader.ATLAS);
