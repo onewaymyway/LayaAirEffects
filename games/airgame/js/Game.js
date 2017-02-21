@@ -17,6 +17,7 @@ var Game = (function () {
         this.radius = [18, 33, 80];
         //初始化引擎，设置游戏设计宽高，并且打开WebGL模式
         Laya.init(480, 852, Laya.WebGL);
+        Laya.alertGlobalError = true;
         this.info = new Laya.Label();
         this.info.fontSize = 20;
         this.info.zOrder = 999;
