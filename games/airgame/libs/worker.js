@@ -1,1 +1,1024 @@
-function testCanImageData(){try{cc=new ImageData(20,20),canUseImageData=!0}catch(t){}}function loadImage(t){PNG.load(t.url,pngLoaded)}function loadImage2(t){var e,a=t.url;e=new XMLHttpRequest,e.open("GET",a,!0),e.responseType="arraybuffer",e.onload=function(){var t,i,r=e.response||e.mozResponseArrayBuffer;if(t=new Uint8Array(r),self.createImageBitmap)return void doCreateImageBitmap(t,a);try{i=new PNG(t),i.url=a,pngLoaded(i)}catch(s){pngFail(a,"parse fail"+s.toString()+":ya")}},e.onerror=function(t){pngFail(a,"loadFail")},e.send(null)}function doCreateImageBitmap(t,e){try{t=new self.Blob([t],{type:"image/png"}),self.createImageBitmap(t).then(function(t){var a={};a.url=e,a.imageBitmap=t,a.dataType="imageBitmap",a.type="Image",postMessage(a,[a.imageBitmap])})["catch"](function(t){showMsgToMain("cache:"+t),pngFail(e,"parse fail"+t+":ya")})}catch(a){pngFail(e,"parse fail"+a.toString()+":ya")}}function getTimeNow(){return(new Date).getTime()}function pngFail(t,e){var a={};a.url=t,a.imagedata=null,a.type="Image",a.msg=e,console.log(e),postMessage(a)}function showMsgToMain(t){var e={};e.type="Msg",e.msg=t,postMessage(e)}function pngLoaded(t){var e={};e.url=t.url,canUseImageData?(e.imagedata=t.getImageData(),e.dataType="imagedata"):(e.buffer=t.getImageDataBuffer(),e.dataType="buffer"),e.width=t.width,e.height=t.height,e.type="Image",canUseImageData?postMessage(e,[e.imagedata.data.buffer]):postMessage(e,[e.buffer.buffer])}var DecodeStream=function(){function t(){this.pos=0,this.bufferLength=0,this.eof=!1,this.buffer=null}return t.prototype={ensureBuffer:function(t){var e=this.buffer,a=e?e.byteLength:0;if(a>t)return e;for(var i=512;t>i;)i<<=1;for(var r=new Uint8Array(i),s=0;a>s;++s)r[s]=e[s];return this.buffer=r},getByte:function(){for(var t=this.pos;this.bufferLength<=t;){if(this.eof)return null;this.readBlock()}return this.buffer[this.pos++]},getBytes:function(t){var e=this.pos;if(t){this.ensureBuffer(e+t);for(var a=e+t;!this.eof&&this.bufferLength<a;)this.readBlock();var i=this.bufferLength;a>i&&(a=i)}else{for(;!this.eof;)this.readBlock();var a=this.bufferLength}return this.pos=a,this.buffer.subarray(e,a)},lookChar:function(){for(var t=this.pos;this.bufferLength<=t;){if(this.eof)return null;this.readBlock()}return String.fromCharCode(this.buffer[this.pos])},getChar:function(){for(var t=this.pos;this.bufferLength<=t;){if(this.eof)return null;this.readBlock()}return String.fromCharCode(this.buffer[this.pos++])},makeSubStream:function(t,e,a){for(var i=t+e;this.bufferLength<=i&&!this.eof;)this.readBlock();return new Stream(this.buffer,t,e,a)},skip:function(t){t||(t=1),this.pos+=t},reset:function(){this.pos=0}},t}(),FlateStream=function(){function t(t){throw new Error(t)}function e(e){var a=0,i=e[a++],r=e[a++];-1!=i&&-1!=r||t("Invalid header in flate stream"),8!=(15&i)&&t("Unknown compression method in flate stream"),((i<<8)+r)%31!=0&&t("Bad FCHECK in flate stream"),32&r&&t("FDICT bit set in flate stream"),this.bytes=e,this.bytesPos=a,this.codeSize=0,this.codeBuf=0,DecodeStream.call(this)}var a=new Uint32Array([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]),i=new Uint32Array([3,4,5,6,7,8,9,10,65547,65549,65551,65553,131091,131095,131099,131103,196643,196651,196659,196667,262211,262227,262243,262259,327811,327843,327875,327907,258,258,258]),r=new Uint32Array([1,2,3,4,65541,65543,131081,131085,196625,196633,262177,262193,327745,327777,393345,393409,459009,459137,524801,525057,590849,591361,657409,658433,724993,727041,794625,798721,868353,876545]),s=[new Uint32Array([459008,524368,524304,524568,459024,524400,524336,590016,459016,524384,524320,589984,524288,524416,524352,590048,459012,524376,524312,589968,459028,524408,524344,590032,459020,524392,524328,59e4,524296,524424,524360,590064,459010,524372,524308,524572,459026,524404,524340,590024,459018,524388,524324,589992,524292,524420,524356,590056,459014,524380,524316,589976,459030,524412,524348,590040,459022,524396,524332,590008,524300,524428,524364,590072,459009,524370,524306,524570,459025,524402,524338,590020,459017,524386,524322,589988,524290,524418,524354,590052,459013,524378,524314,589972,459029,524410,524346,590036,459021,524394,524330,590004,524298,524426,524362,590068,459011,524374,524310,524574,459027,524406,524342,590028,459019,524390,524326,589996,524294,524422,524358,590060,459015,524382,524318,589980,459031,524414,524350,590044,459023,524398,524334,590012,524302,524430,524366,590076,459008,524369,524305,524569,459024,524401,524337,590018,459016,524385,524321,589986,524289,524417,524353,590050,459012,524377,524313,589970,459028,524409,524345,590034,459020,524393,524329,590002,524297,524425,524361,590066,459010,524373,524309,524573,459026,524405,524341,590026,459018,524389,524325,589994,524293,524421,524357,590058,459014,524381,524317,589978,459030,524413,524349,590042,459022,524397,524333,590010,524301,524429,524365,590074,459009,524371,524307,524571,459025,524403,524339,590022,459017,524387,524323,589990,524291,524419,524355,590054,459013,524379,524315,589974,459029,524411,524347,590038,459021,524395,524331,590006,524299,524427,524363,590070,459011,524375,524311,524575,459027,524407,524343,590030,459019,524391,524327,589998,524295,524423,524359,590062,459015,524383,524319,589982,459031,524415,524351,590046,459023,524399,524335,590014,524303,524431,524367,590078,459008,524368,524304,524568,459024,524400,524336,590017,459016,524384,524320,589985,524288,524416,524352,590049,459012,524376,524312,589969,459028,524408,524344,590033,459020,524392,524328,590001,524296,524424,524360,590065,459010,524372,524308,524572,459026,524404,524340,590025,459018,524388,524324,589993,524292,524420,524356,590057,459014,524380,524316,589977,459030,524412,524348,590041,459022,524396,524332,590009,524300,524428,524364,590073,459009,524370,524306,524570,459025,524402,524338,590021,459017,524386,524322,589989,524290,524418,524354,590053,459013,524378,524314,589973,459029,524410,524346,590037,459021,524394,524330,590005,524298,524426,524362,590069,459011,524374,524310,524574,459027,524406,524342,590029,459019,524390,524326,589997,524294,524422,524358,590061,459015,524382,524318,589981,459031,524414,524350,590045,459023,524398,524334,590013,524302,524430,524366,590077,459008,524369,524305,524569,459024,524401,524337,590019,459016,524385,524321,589987,524289,524417,524353,590051,459012,524377,524313,589971,459028,524409,524345,590035,459020,524393,524329,590003,524297,524425,524361,590067,459010,524373,524309,524573,459026,524405,524341,590027,459018,524389,524325,589995,524293,524421,524357,590059,459014,524381,524317,589979,459030,524413,524349,590043,459022,524397,524333,590011,524301,524429,524365,590075,459009,524371,524307,524571,459025,524403,524339,590023,459017,524387,524323,589991,524291,524419,524355,590055,459013,524379,524315,589975,459029,524411,524347,590039,459021,524395,524331,590007,524299,524427,524363,590071,459011,524375,524311,524575,459027,524407,524343,590031,459019,524391,524327,589999,524295,524423,524359,590063,459015,524383,524319,589983,459031,524415,524351,590047,459023,524399,524335,590015,524303,524431,524367,590079]),9],n=[new Uint32Array([327680,327696,327688,327704,327684,327700,327692,327708,327682,327698,327690,327706,327686,327702,327694,0,327681,327697,327689,327705,327685,327701,327693,327709,327683,327699,327691,327707,327687,327703,327695,0]),5];return e.prototype=Object.create(DecodeStream.prototype),e.prototype.getBits=function(e){for(var a,i=this.codeSize,r=this.codeBuf,s=this.bytes,n=this.bytesPos;e>i;)"undefined"==typeof(a=s[n++])&&t("Bad encoding in flate stream"),r|=a<<i,i+=8;return a=r&(1<<e)-1,this.codeBuf=r>>e,this.codeSize=i-=e,this.bytesPos=n,a},e.prototype.getCode=function(e){for(var a=e[0],i=e[1],r=this.codeSize,s=this.codeBuf,n=this.bytes,o=this.bytesPos;i>r;){var h;"undefined"==typeof(h=n[o++])&&t("Bad encoding in flate stream"),s|=h<<r,r+=8}var f=a[s&(1<<i)-1],d=f>>16,c=65535&f;return(0==r||d>r||0==d)&&t("Bad encoding in flate stream"),this.codeBuf=s>>d,this.codeSize=r-d,this.bytesPos=o,c},e.prototype.generateHuffmanTable=function(t){for(var e=t.length,a=0,i=0;e>i;++i)t[i]>a&&(a=t[i]);for(var r=1<<a,s=new Uint32Array(r),n=1,o=0,h=2;a>=n;++n,o<<=1,h<<=1)for(var f=0;e>f;++f)if(t[f]==n){for(var d=0,c=o,i=0;n>i;++i)d=d<<1|1&c,c>>=1;for(var i=d;r>i;i+=h)s[i]=n<<16|f;++o}return[s,a]},e.prototype.readBlock=function(){function e(t,e,a,i,r){for(var s=t.getBits(a)+i;s-- >0;)e[U++]=r}var o=this.getBits(3);if(1&o&&(this.eof=!0),o>>=1,0==o){var h,f=this.bytes,d=this.bytesPos;"undefined"==typeof(h=f[d++])&&t("Bad block header in flate stream");var c=h;"undefined"==typeof(h=f[d++])&&t("Bad block header in flate stream"),c|=h<<8,"undefined"==typeof(h=f[d++])&&t("Bad block header in flate stream");var u=h;"undefined"==typeof(h=f[d++])&&t("Bad block header in flate stream"),u|=h<<8,u!=(65535&~c)&&t("Bad uncompressed block length in flate stream"),this.codeBuf=0,this.codeSize=0;var l=this.bufferLength,p=this.ensureBuffer(l+c),g=l+c;this.bufferLength=g;for(var m=l;g>m;++m){if("undefined"==typeof(h=f[d++])){this.eof=!0;break}p[m]=h}return void(this.bytesPos=d)}var y,b;if(1==o)y=s,b=n;else if(2==o){for(var v=this.getBits(5)+257,B=this.getBits(5)+1,w=this.getBits(4)+4,I=Array(a.length),U=0;w>U;)I[a[U++]]=this.getBits(3);for(var D=this.generateHuffmanTable(I),k=0,U=0,T=v+B,C=new Array(T);T>U;){var A=this.getCode(D);16==A?e(this,C,2,3,k):17==A?e(this,C,3,3,k=0):18==A?e(this,C,7,11,k=0):C[U++]=k=A}y=this.generateHuffmanTable(C.slice(0,v)),b=this.generateHuffmanTable(C.slice(v,T))}else t("Unknown block type in flate stream");for(var p=this.buffer,S=p?p.length:0,P=this.bufferLength;;){var L=this.getCode(y);if(256>L)P+1>=S&&(p=this.ensureBuffer(P+1),S=p.length),p[P++]=L;else{if(256==L)return void(this.bufferLength=P);L-=257,L=i[L];var M=L>>16;M>0&&(M=this.getBits(M));var k=(65535&L)+M;L=this.getCode(b),L=r[L],M=L>>16,M>0&&(M=this.getBits(M));var x=(65535&L)+M;P+k>=S&&(p=this.ensureBuffer(P+k),S=p.length);for(var F=0;k>F;++F,++P)p[P]=p[P-x]}}},e}();(function(){var t;t=function(){function t(t){var e,a,i,r,s,n,o,h,f,d,c,u,l,p;for(this.data=t,this.pos=8,this.palette=[],this.imgData=[],this.transparency={},this.animation=null,this.text={},s=null;;){switch(e=this.readUInt32(),f=function(){var t,e;for(e=[],n=t=0;4>t;n=++t)e.push(String.fromCharCode(this.data[this.pos++]));return e}.call(this).join("")){case"IHDR":this.width=this.readUInt32(),this.height=this.readUInt32(),this.bits=this.data[this.pos++],this.colorType=this.data[this.pos++],this.compressionMethod=this.data[this.pos++],this.filterMethod=this.data[this.pos++],this.interlaceMethod=this.data[this.pos++];break;case"acTL":this.animation={numFrames:this.readUInt32(),numPlays:this.readUInt32()||1/0,frames:[]};break;case"PLTE":this.palette=this.read(e);break;case"fcTL":s&&this.animation.frames.push(s),this.pos+=4,s={width:this.readUInt32(),height:this.readUInt32(),xOffset:this.readUInt32(),yOffset:this.readUInt32()},r=this.readUInt16(),i=this.readUInt16()||100,s.delay=1e3*r/i,s.disposeOp=this.data[this.pos++],s.blendOp=this.data[this.pos++],s.data=[];break;case"IDAT":case"fdAT":for("fdAT"===f&&(this.pos+=4,e-=4),t=(null!=s?s.data:void 0)||this.imgData,n=u=0;e>=0?e>u:u>e;n=e>=0?++u:--u)t.push(this.data[this.pos++]);break;case"tRNS":switch(this.transparency={},this.colorType){case 3:if(this.transparency.indexed=this.read(e),d=255-this.transparency.indexed.length,d>0)for(n=l=0;d>=0?d>l:l>d;n=d>=0?++l:--l)this.transparency.indexed.push(255);break;case 0:this.transparency.grayscale=this.read(e)[0];break;case 2:this.transparency.rgb=this.read(e)}break;case"tEXt":c=this.read(e),o=c.indexOf(0),h=String.fromCharCode.apply(String,c.slice(0,o)),this.text[h]=String.fromCharCode.apply(String,c.slice(o+1));break;case"IEND":return s&&this.animation.frames.push(s),this.colors=function(){switch(this.colorType){case 0:case 3:case 4:return 1;case 2:case 6:return 3}}.call(this),this.hasAlphaChannel=4===(p=this.colorType)||6===p,a=this.colors+(this.hasAlphaChannel?1:0),this.pixelBitlength=this.bits*a,this.colorSpace=function(){switch(this.colors){case 1:return"DeviceGray";case 3:return"DeviceRGB"}}.call(this),void(this.imgData=new Uint8Array(this.imgData));default:this.pos+=e}if(this.pos+=4,this.pos>this.data.length)throw new Error("Incomplete or corrupt PNG file")}}var e,a,i,r,s,n;return t.load=function(e,a){var i;return"function"==typeof canvas&&(a=canvas),i=new XMLHttpRequest,i.open("GET",e,!0),i.responseType="arraybuffer",i.onload=function(){var r,s;return r=new Uint8Array(i.response||i.mozResponseArrayBuffer),s=new t(r),s.url=e,"function"==typeof a?a(s):void 0},i.send(null)},r=0,i=1,s=2,a=0,e=1,t.prototype.read=function(t){var e,a,i;for(i=[],e=a=0;t>=0?t>a:a>t;e=t>=0?++a:--a)i.push(this.data[this.pos++]);return i},t.prototype.readUInt32=function(){var t,e,a,i;return t=this.data[this.pos++]<<24,e=this.data[this.pos++]<<16,a=this.data[this.pos++]<<8,i=this.data[this.pos++],t|e|a|i},t.prototype.readUInt16=function(){var t,e;return t=this.data[this.pos++]<<8,e=this.data[this.pos++],t|e},t.prototype.decodePixels=function(t){console.log("decodePixels");var e,a,i,r,s,n,o,h,f,d,c,u,l,p,g,m,y,b,v,B,w,I,U;if(null==t&&(t=this.imgData),0===t.length)return new Uint8Array(0);for(t=new FlateStream(t),t=t.getBytes(),u=this.pixelBitlength/8,m=u*this.width,l=new Uint8Array(m*this.height),n=t.length,g=0,p=0,a=0;n>p;){switch(t[p++]){case 0:for(r=v=0;m>v;r=v+=1)l[a++]=t[p++];break;case 1:for(r=B=0;m>B;r=B+=1)e=t[p++],s=u>r?0:l[a-u],l[a++]=(e+s)%256;break;case 2:for(r=w=0;m>w;r=w+=1)e=t[p++],i=(r-r%u)/u,y=g&&l[(g-1)*m+i*u+r%u],l[a++]=(y+e)%256;break;case 3:for(r=I=0;m>I;r=I+=1)e=t[p++],i=(r-r%u)/u,s=u>r?0:l[a-u],y=g&&l[(g-1)*m+i*u+r%u],l[a++]=(e+Math.floor((s+y)/2))%256;break;case 4:for(r=U=0;m>U;r=U+=1)e=t[p++],i=(r-r%u)/u,s=u>r?0:l[a-u],0===g?y=b=0:(y=l[(g-1)*m+i*u+r%u],b=i&&l[(g-1)*m+(i-1)*u+r%u]),o=s+y-b,h=Math.abs(o-s),d=Math.abs(o-y),c=Math.abs(o-b),f=d>=h&&c>=h?s:c>=d?y:b,l[a++]=(e+f)%256;break;default:throw new Error("Invalid filter algorithm: "+t[p-1])}g++}return l},t.prototype.decodePalette=function(){var t,e,a,i,r,s,n,o,h,f;for(i=this.palette,n=this.transparency.indexed||[],s=new Uint8Array((n.length||0)+i.length),r=0,a=i.length,t=0,e=o=0,h=i.length;h>o;e=o+=3)s[r++]=i[e],s[r++]=i[e+1],s[r++]=i[e+2],s[r++]=null!=(f=n[t++])?f:255;return s},t.prototype.getImageData=function(){var t=new self.ImageData(this.width,this.height);return this.copyToImageData(t,this.decodePixels()),t},t.prototype.getImageDataBuffer=function(){var t=new self.Uint8ClampedArray(this.width*this.height*4);return this.copyToImageData(t,this.decodePixels()),t},t.prototype.copyToImageData=function(t,e){var a,i,r,s,n,o,h,f,d,c,u;if(i=this.colors,d=null,a=this.hasAlphaChannel,this.palette.length&&(d=null!=(u=this._decodedPalette)?u:this._decodedPalette=this.decodePalette(),i=4,a=!0),r=t.data||t,f=r.length,n=d||e,s=o=0,1===i)for(;f>s;)h=d?4*e[s/4]:o,c=n[h++],r[s++]=c,r[s++]=c,r[s++]=c,r[s++]=a?n[h++]:255,o=h;else for(;f>s;)h=d?4*e[s/4]:o,r[s++]=n[h++],r[s++]=n[h++],r[s++]=n[h++],r[s++]=a?n[h++]:255,o=h},t.prototype.decode=function(){var t;return t=new Uint8Array(this.width*this.height*4),this.copyToImageData(t,this.decodePixels()),t},t.prototype.decodeFrames=function(t){var e,a,i,r,s,o,h,f;if(this.animation){for(h=this.animation.frames,f=[],a=s=0,o=h.length;o>s;a=++s)e=h[a],i=t.createImageData(e.width,e.height),r=this.decodePixels(new Uint8Array(e.data)),this.copyToImageData(i,r),e.imageData=i,f.push(e.image=n(i));return f}},t}(),this.PNG=t}).call(this),onmessage=function(t){var e=t.data;switch(e.type){case"load":loadImage2(e)}};var canUseImageData=!1;testCanImageData();
+/*
+ * Extracted from pdf.js
+ * https://github.com/andreasgal/pdf.js
+ *
+ * Copyright (c) 2011 Mozilla Foundation
+ *
+ * Contributors: Andreas Gal <gal@mozilla.com>
+ *               Chris G Jones <cjones@mozilla.com>
+ *               Shaon Barman <shaon.barman@gmail.com>
+ *               Vivien Nicolas <21@vingtetun.org>
+ *               Justin D'Arcangelo <justindarc@gmail.com>
+ *               Yury Delendik
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+var DecodeStream = (function() {
+  function constructor() {
+    this.pos = 0;
+    this.bufferLength = 0;
+    this.eof = false;
+    this.buffer = null;
+  }
+
+  constructor.prototype = {
+    ensureBuffer: function decodestream_ensureBuffer(requested) {
+      var buffer = this.buffer;
+      var current = buffer ? buffer.byteLength : 0;
+      if (requested < current)
+        return buffer;
+      var size = 512;
+      while (size < requested)
+        size <<= 1;
+      var buffer2 = new Uint8Array(size);
+      for (var i = 0; i < current; ++i)
+        buffer2[i] = buffer[i];
+      return this.buffer = buffer2;
+    },
+    getByte: function decodestream_getByte() {
+      var pos = this.pos;
+      while (this.bufferLength <= pos) {
+        if (this.eof)
+          return null;
+        this.readBlock();
+      }
+      return this.buffer[this.pos++];
+    },
+    getBytes: function decodestream_getBytes(length) {
+      var pos = this.pos;
+
+      if (length) {
+        this.ensureBuffer(pos + length);
+        var end = pos + length;
+
+        while (!this.eof && this.bufferLength < end)
+          this.readBlock();
+
+        var bufEnd = this.bufferLength;
+        if (end > bufEnd)
+          end = bufEnd;
+      } else {
+        while (!this.eof)
+          this.readBlock();
+
+        var end = this.bufferLength;
+      }
+
+      this.pos = end;
+      return this.buffer.subarray(pos, end);
+    },
+    lookChar: function decodestream_lookChar() {
+      var pos = this.pos;
+      while (this.bufferLength <= pos) {
+        if (this.eof)
+          return null;
+        this.readBlock();
+      }
+      return String.fromCharCode(this.buffer[this.pos]);
+    },
+    getChar: function decodestream_getChar() {
+      var pos = this.pos;
+      while (this.bufferLength <= pos) {
+        if (this.eof)
+          return null;
+        this.readBlock();
+      }
+      return String.fromCharCode(this.buffer[this.pos++]);
+    },
+    makeSubStream: function decodestream_makeSubstream(start, length, dict) {
+      var end = start + length;
+      while (this.bufferLength <= end && !this.eof)
+        this.readBlock();
+      return new Stream(this.buffer, start, length, dict);
+    },
+    skip: function decodestream_skip(n) {
+      if (!n)
+        n = 1;
+      this.pos += n;
+    },
+    reset: function decodestream_reset() {
+      this.pos = 0;
+    }
+  };
+
+  return constructor;
+})();
+
+var FlateStream = (function() {
+  var codeLenCodeMap = new Uint32Array([
+    16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
+  ]);
+
+  var lengthDecode = new Uint32Array([
+    0x00003, 0x00004, 0x00005, 0x00006, 0x00007, 0x00008, 0x00009, 0x0000a,
+    0x1000b, 0x1000d, 0x1000f, 0x10011, 0x20013, 0x20017, 0x2001b, 0x2001f,
+    0x30023, 0x3002b, 0x30033, 0x3003b, 0x40043, 0x40053, 0x40063, 0x40073,
+    0x50083, 0x500a3, 0x500c3, 0x500e3, 0x00102, 0x00102, 0x00102
+  ]);
+
+  var distDecode = new Uint32Array([
+    0x00001, 0x00002, 0x00003, 0x00004, 0x10005, 0x10007, 0x20009, 0x2000d,
+    0x30011, 0x30019, 0x40021, 0x40031, 0x50041, 0x50061, 0x60081, 0x600c1,
+    0x70101, 0x70181, 0x80201, 0x80301, 0x90401, 0x90601, 0xa0801, 0xa0c01,
+    0xb1001, 0xb1801, 0xc2001, 0xc3001, 0xd4001, 0xd6001
+  ]);
+
+  var fixedLitCodeTab = [new Uint32Array([
+    0x70100, 0x80050, 0x80010, 0x80118, 0x70110, 0x80070, 0x80030, 0x900c0,
+    0x70108, 0x80060, 0x80020, 0x900a0, 0x80000, 0x80080, 0x80040, 0x900e0,
+    0x70104, 0x80058, 0x80018, 0x90090, 0x70114, 0x80078, 0x80038, 0x900d0,
+    0x7010c, 0x80068, 0x80028, 0x900b0, 0x80008, 0x80088, 0x80048, 0x900f0,
+    0x70102, 0x80054, 0x80014, 0x8011c, 0x70112, 0x80074, 0x80034, 0x900c8,
+    0x7010a, 0x80064, 0x80024, 0x900a8, 0x80004, 0x80084, 0x80044, 0x900e8,
+    0x70106, 0x8005c, 0x8001c, 0x90098, 0x70116, 0x8007c, 0x8003c, 0x900d8,
+    0x7010e, 0x8006c, 0x8002c, 0x900b8, 0x8000c, 0x8008c, 0x8004c, 0x900f8,
+    0x70101, 0x80052, 0x80012, 0x8011a, 0x70111, 0x80072, 0x80032, 0x900c4,
+    0x70109, 0x80062, 0x80022, 0x900a4, 0x80002, 0x80082, 0x80042, 0x900e4,
+    0x70105, 0x8005a, 0x8001a, 0x90094, 0x70115, 0x8007a, 0x8003a, 0x900d4,
+    0x7010d, 0x8006a, 0x8002a, 0x900b4, 0x8000a, 0x8008a, 0x8004a, 0x900f4,
+    0x70103, 0x80056, 0x80016, 0x8011e, 0x70113, 0x80076, 0x80036, 0x900cc,
+    0x7010b, 0x80066, 0x80026, 0x900ac, 0x80006, 0x80086, 0x80046, 0x900ec,
+    0x70107, 0x8005e, 0x8001e, 0x9009c, 0x70117, 0x8007e, 0x8003e, 0x900dc,
+    0x7010f, 0x8006e, 0x8002e, 0x900bc, 0x8000e, 0x8008e, 0x8004e, 0x900fc,
+    0x70100, 0x80051, 0x80011, 0x80119, 0x70110, 0x80071, 0x80031, 0x900c2,
+    0x70108, 0x80061, 0x80021, 0x900a2, 0x80001, 0x80081, 0x80041, 0x900e2,
+    0x70104, 0x80059, 0x80019, 0x90092, 0x70114, 0x80079, 0x80039, 0x900d2,
+    0x7010c, 0x80069, 0x80029, 0x900b2, 0x80009, 0x80089, 0x80049, 0x900f2,
+    0x70102, 0x80055, 0x80015, 0x8011d, 0x70112, 0x80075, 0x80035, 0x900ca,
+    0x7010a, 0x80065, 0x80025, 0x900aa, 0x80005, 0x80085, 0x80045, 0x900ea,
+    0x70106, 0x8005d, 0x8001d, 0x9009a, 0x70116, 0x8007d, 0x8003d, 0x900da,
+    0x7010e, 0x8006d, 0x8002d, 0x900ba, 0x8000d, 0x8008d, 0x8004d, 0x900fa,
+    0x70101, 0x80053, 0x80013, 0x8011b, 0x70111, 0x80073, 0x80033, 0x900c6,
+    0x70109, 0x80063, 0x80023, 0x900a6, 0x80003, 0x80083, 0x80043, 0x900e6,
+    0x70105, 0x8005b, 0x8001b, 0x90096, 0x70115, 0x8007b, 0x8003b, 0x900d6,
+    0x7010d, 0x8006b, 0x8002b, 0x900b6, 0x8000b, 0x8008b, 0x8004b, 0x900f6,
+    0x70103, 0x80057, 0x80017, 0x8011f, 0x70113, 0x80077, 0x80037, 0x900ce,
+    0x7010b, 0x80067, 0x80027, 0x900ae, 0x80007, 0x80087, 0x80047, 0x900ee,
+    0x70107, 0x8005f, 0x8001f, 0x9009e, 0x70117, 0x8007f, 0x8003f, 0x900de,
+    0x7010f, 0x8006f, 0x8002f, 0x900be, 0x8000f, 0x8008f, 0x8004f, 0x900fe,
+    0x70100, 0x80050, 0x80010, 0x80118, 0x70110, 0x80070, 0x80030, 0x900c1,
+    0x70108, 0x80060, 0x80020, 0x900a1, 0x80000, 0x80080, 0x80040, 0x900e1,
+    0x70104, 0x80058, 0x80018, 0x90091, 0x70114, 0x80078, 0x80038, 0x900d1,
+    0x7010c, 0x80068, 0x80028, 0x900b1, 0x80008, 0x80088, 0x80048, 0x900f1,
+    0x70102, 0x80054, 0x80014, 0x8011c, 0x70112, 0x80074, 0x80034, 0x900c9,
+    0x7010a, 0x80064, 0x80024, 0x900a9, 0x80004, 0x80084, 0x80044, 0x900e9,
+    0x70106, 0x8005c, 0x8001c, 0x90099, 0x70116, 0x8007c, 0x8003c, 0x900d9,
+    0x7010e, 0x8006c, 0x8002c, 0x900b9, 0x8000c, 0x8008c, 0x8004c, 0x900f9,
+    0x70101, 0x80052, 0x80012, 0x8011a, 0x70111, 0x80072, 0x80032, 0x900c5,
+    0x70109, 0x80062, 0x80022, 0x900a5, 0x80002, 0x80082, 0x80042, 0x900e5,
+    0x70105, 0x8005a, 0x8001a, 0x90095, 0x70115, 0x8007a, 0x8003a, 0x900d5,
+    0x7010d, 0x8006a, 0x8002a, 0x900b5, 0x8000a, 0x8008a, 0x8004a, 0x900f5,
+    0x70103, 0x80056, 0x80016, 0x8011e, 0x70113, 0x80076, 0x80036, 0x900cd,
+    0x7010b, 0x80066, 0x80026, 0x900ad, 0x80006, 0x80086, 0x80046, 0x900ed,
+    0x70107, 0x8005e, 0x8001e, 0x9009d, 0x70117, 0x8007e, 0x8003e, 0x900dd,
+    0x7010f, 0x8006e, 0x8002e, 0x900bd, 0x8000e, 0x8008e, 0x8004e, 0x900fd,
+    0x70100, 0x80051, 0x80011, 0x80119, 0x70110, 0x80071, 0x80031, 0x900c3,
+    0x70108, 0x80061, 0x80021, 0x900a3, 0x80001, 0x80081, 0x80041, 0x900e3,
+    0x70104, 0x80059, 0x80019, 0x90093, 0x70114, 0x80079, 0x80039, 0x900d3,
+    0x7010c, 0x80069, 0x80029, 0x900b3, 0x80009, 0x80089, 0x80049, 0x900f3,
+    0x70102, 0x80055, 0x80015, 0x8011d, 0x70112, 0x80075, 0x80035, 0x900cb,
+    0x7010a, 0x80065, 0x80025, 0x900ab, 0x80005, 0x80085, 0x80045, 0x900eb,
+    0x70106, 0x8005d, 0x8001d, 0x9009b, 0x70116, 0x8007d, 0x8003d, 0x900db,
+    0x7010e, 0x8006d, 0x8002d, 0x900bb, 0x8000d, 0x8008d, 0x8004d, 0x900fb,
+    0x70101, 0x80053, 0x80013, 0x8011b, 0x70111, 0x80073, 0x80033, 0x900c7,
+    0x70109, 0x80063, 0x80023, 0x900a7, 0x80003, 0x80083, 0x80043, 0x900e7,
+    0x70105, 0x8005b, 0x8001b, 0x90097, 0x70115, 0x8007b, 0x8003b, 0x900d7,
+    0x7010d, 0x8006b, 0x8002b, 0x900b7, 0x8000b, 0x8008b, 0x8004b, 0x900f7,
+    0x70103, 0x80057, 0x80017, 0x8011f, 0x70113, 0x80077, 0x80037, 0x900cf,
+    0x7010b, 0x80067, 0x80027, 0x900af, 0x80007, 0x80087, 0x80047, 0x900ef,
+    0x70107, 0x8005f, 0x8001f, 0x9009f, 0x70117, 0x8007f, 0x8003f, 0x900df,
+    0x7010f, 0x8006f, 0x8002f, 0x900bf, 0x8000f, 0x8008f, 0x8004f, 0x900ff
+  ]), 9];
+
+  var fixedDistCodeTab = [new Uint32Array([
+    0x50000, 0x50010, 0x50008, 0x50018, 0x50004, 0x50014, 0x5000c, 0x5001c,
+    0x50002, 0x50012, 0x5000a, 0x5001a, 0x50006, 0x50016, 0x5000e, 0x00000,
+    0x50001, 0x50011, 0x50009, 0x50019, 0x50005, 0x50015, 0x5000d, 0x5001d,
+    0x50003, 0x50013, 0x5000b, 0x5001b, 0x50007, 0x50017, 0x5000f, 0x00000
+  ]), 5];
+  
+  function error(e) {
+      throw new Error(e)
+  }
+
+  function constructor(bytes) {
+    //var bytes = stream.getBytes();
+    var bytesPos = 0;
+
+    var cmf = bytes[bytesPos++];
+    var flg = bytes[bytesPos++];
+    if (cmf == -1 || flg == -1)
+      error('Invalid header in flate stream');
+    if ((cmf & 0x0f) != 0x08)
+      error('Unknown compression method in flate stream');
+    if ((((cmf << 8) + flg) % 31) != 0)
+      error('Bad FCHECK in flate stream');
+    if (flg & 0x20)
+      error('FDICT bit set in flate stream');
+
+    this.bytes = bytes;
+    this.bytesPos = bytesPos;
+
+    this.codeSize = 0;
+    this.codeBuf = 0;
+
+    DecodeStream.call(this);
+  }
+
+  constructor.prototype = Object.create(DecodeStream.prototype);
+
+  constructor.prototype.getBits = function(bits) {
+    var codeSize = this.codeSize;
+    var codeBuf = this.codeBuf;
+    var bytes = this.bytes;
+    var bytesPos = this.bytesPos;
+
+    var b;
+    while (codeSize < bits) {
+      if (typeof (b = bytes[bytesPos++]) == 'undefined')
+        error('Bad encoding in flate stream');
+      codeBuf |= b << codeSize;
+      codeSize += 8;
+    }
+    b = codeBuf & ((1 << bits) - 1);
+    this.codeBuf = codeBuf >> bits;
+    this.codeSize = codeSize -= bits;
+    this.bytesPos = bytesPos;
+    return b;
+  };
+
+  constructor.prototype.getCode = function(table) {
+    var codes = table[0];
+    var maxLen = table[1];
+    var codeSize = this.codeSize;
+    var codeBuf = this.codeBuf;
+    var bytes = this.bytes;
+    var bytesPos = this.bytesPos;
+
+    while (codeSize < maxLen) {
+      var b;
+      if (typeof (b = bytes[bytesPos++]) == 'undefined')
+        error('Bad encoding in flate stream');
+      codeBuf |= (b << codeSize);
+      codeSize += 8;
+    }
+    var code = codes[codeBuf & ((1 << maxLen) - 1)];
+    var codeLen = code >> 16;
+    var codeVal = code & 0xffff;
+    if (codeSize == 0 || codeSize < codeLen || codeLen == 0)
+      error('Bad encoding in flate stream');
+    this.codeBuf = (codeBuf >> codeLen);
+    this.codeSize = (codeSize - codeLen);
+    this.bytesPos = bytesPos;
+    return codeVal;
+  };
+
+  constructor.prototype.generateHuffmanTable = function(lengths) {
+    var n = lengths.length;
+
+    // find max code length
+    var maxLen = 0;
+    for (var i = 0; i < n; ++i) {
+      if (lengths[i] > maxLen)
+        maxLen = lengths[i];
+    }
+
+    // build the table
+    var size = 1 << maxLen;
+    var codes = new Uint32Array(size);
+    for (var len = 1, code = 0, skip = 2;
+         len <= maxLen;
+         ++len, code <<= 1, skip <<= 1) {
+      for (var val = 0; val < n; ++val) {
+        if (lengths[val] == len) {
+          // bit-reverse the code
+          var code2 = 0;
+          var t = code;
+          for (var i = 0; i < len; ++i) {
+            code2 = (code2 << 1) | (t & 1);
+            t >>= 1;
+          }
+
+          // fill the table entries
+          for (var i = code2; i < size; i += skip)
+            codes[i] = (len << 16) | val;
+
+          ++code;
+        }
+      }
+    }
+
+    return [codes, maxLen];
+  };
+
+  constructor.prototype.readBlock = function() {
+    function repeat(stream, array, len, offset, what) {
+      var repeat = stream.getBits(len) + offset;
+      while (repeat-- > 0)
+        array[i++] = what;
+    }
+
+    // read block header
+    var hdr = this.getBits(3);
+    if (hdr & 1)
+      this.eof = true;
+    hdr >>= 1;
+
+    if (hdr == 0) { // uncompressed block
+      var bytes = this.bytes;
+      var bytesPos = this.bytesPos;
+      var b;
+
+      if (typeof (b = bytes[bytesPos++]) == 'undefined')
+        error('Bad block header in flate stream');
+      var blockLen = b;
+      if (typeof (b = bytes[bytesPos++]) == 'undefined')
+        error('Bad block header in flate stream');
+      blockLen |= (b << 8);
+      if (typeof (b = bytes[bytesPos++]) == 'undefined')
+        error('Bad block header in flate stream');
+      var check = b;
+      if (typeof (b = bytes[bytesPos++]) == 'undefined')
+        error('Bad block header in flate stream');
+      check |= (b << 8);
+      if (check != (~blockLen & 0xffff))
+        error('Bad uncompressed block length in flate stream');
+
+      this.codeBuf = 0;
+      this.codeSize = 0;
+
+      var bufferLength = this.bufferLength;
+      var buffer = this.ensureBuffer(bufferLength + blockLen);
+      var end = bufferLength + blockLen;
+      this.bufferLength = end;
+      for (var n = bufferLength; n < end; ++n) {
+        if (typeof (b = bytes[bytesPos++]) == 'undefined') {
+          this.eof = true;
+          break;
+        }
+        buffer[n] = b;
+      }
+      this.bytesPos = bytesPos;
+      return;
+    }
+
+    var litCodeTable;
+    var distCodeTable;
+    if (hdr == 1) { // compressed block, fixed codes
+      litCodeTable = fixedLitCodeTab;
+      distCodeTable = fixedDistCodeTab;
+    } else if (hdr == 2) { // compressed block, dynamic codes
+      var numLitCodes = this.getBits(5) + 257;
+      var numDistCodes = this.getBits(5) + 1;
+      var numCodeLenCodes = this.getBits(4) + 4;
+
+      // build the code lengths code table
+      var codeLenCodeLengths = Array(codeLenCodeMap.length);
+      var i = 0;
+      while (i < numCodeLenCodes)
+        codeLenCodeLengths[codeLenCodeMap[i++]] = this.getBits(3);
+      var codeLenCodeTab = this.generateHuffmanTable(codeLenCodeLengths);
+
+      // build the literal and distance code tables
+      var len = 0;
+      var i = 0;
+      var codes = numLitCodes + numDistCodes;
+      var codeLengths = new Array(codes);
+      while (i < codes) {
+        var code = this.getCode(codeLenCodeTab);
+        if (code == 16) {
+          repeat(this, codeLengths, 2, 3, len);
+        } else if (code == 17) {
+          repeat(this, codeLengths, 3, 3, len = 0);
+        } else if (code == 18) {
+          repeat(this, codeLengths, 7, 11, len = 0);
+        } else {
+          codeLengths[i++] = len = code;
+        }
+      }
+
+      litCodeTable =
+        this.generateHuffmanTable(codeLengths.slice(0, numLitCodes));
+      distCodeTable =
+        this.generateHuffmanTable(codeLengths.slice(numLitCodes, codes));
+    } else {
+      error('Unknown block type in flate stream');
+    }
+
+    var buffer = this.buffer;
+    var limit = buffer ? buffer.length : 0;
+    var pos = this.bufferLength;
+    while (true) {
+      var code1 = this.getCode(litCodeTable);
+      if (code1 < 256) {
+        if (pos + 1 >= limit) {
+          buffer = this.ensureBuffer(pos + 1);
+          limit = buffer.length;
+        }
+        buffer[pos++] = code1;
+        continue;
+      }
+      if (code1 == 256) {
+        this.bufferLength = pos;
+        return;
+      }
+      code1 -= 257;
+      code1 = lengthDecode[code1];
+      var code2 = code1 >> 16;
+      if (code2 > 0)
+        code2 = this.getBits(code2);
+      var len = (code1 & 0xffff) + code2;
+      code1 = this.getCode(distCodeTable);
+      code1 = distDecode[code1];
+      code2 = code1 >> 16;
+      if (code2 > 0)
+        code2 = this.getBits(code2);
+      var dist = (code1 & 0xffff) + code2;
+      if (pos + len >= limit) {
+        buffer = this.ensureBuffer(pos + len);
+        limit = buffer.length;
+      }
+      for (var k = 0; k < len; ++k, ++pos)
+        buffer[pos] = buffer[pos - dist];
+    }
+  };
+
+  return constructor;
+})();
+
+// Generated by CoffeeScript 1.4.0
+
+/*
+# MIT LICENSE
+# Copyright (c) 2011 Devon Govett
+# 
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+# software and associated documentation files (the "Software"), to deal in the Software 
+# without restriction, including without limitation the rights to use, copy, modify, merge, 
+# publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons 
+# to whom the Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included in all copies or 
+# substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING 
+# BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
+# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+
+(function() {
+  var PNG;
+
+  PNG = (function() {
+    var APNG_BLEND_OP_OVER, APNG_BLEND_OP_SOURCE, APNG_DISPOSE_OP_BACKGROUND, APNG_DISPOSE_OP_NONE, APNG_DISPOSE_OP_PREVIOUS, makeImage, scratchCanvas, scratchCtx;
+
+    PNG.load = function(url,callback) {
+      var xhr,
+        _this = this;
+      if (typeof canvas === 'function') {
+        callback = canvas;
+      }
+      xhr = new XMLHttpRequest;
+      xhr.open("GET", url, true);
+      xhr.responseType = "arraybuffer";
+      xhr.onload = function() {
+        var data, png;
+        data = new Uint8Array(xhr.response || xhr.mozResponseArrayBuffer);
+        png = new PNG(data);
+		png.url=url;
+        return typeof callback === "function" ? callback(png) : void 0;
+      };
+      return xhr.send(null);
+    };
+
+    APNG_DISPOSE_OP_NONE = 0;
+
+    APNG_DISPOSE_OP_BACKGROUND = 1;
+
+    APNG_DISPOSE_OP_PREVIOUS = 2;
+
+    APNG_BLEND_OP_SOURCE = 0;
+
+    APNG_BLEND_OP_OVER = 1;
+
+    function PNG(data) {
+      var chunkSize, colors, delayDen, delayNum, frame, i, index, key, section, short, text, _i, _j, _ref;
+      this.data = data;
+      this.pos = 8;
+      this.palette = [];
+      this.imgData = [];
+      this.transparency = {};
+      this.animation = null;
+      this.text = {};
+      frame = null;
+      while (true) {
+        chunkSize = this.readUInt32();
+        section = ((function() {
+          var _i, _results;
+          _results = [];
+          for (i = _i = 0; _i < 4; i = ++_i) {
+            _results.push(String.fromCharCode(this.data[this.pos++]));
+          }
+          return _results;
+        }).call(this)).join('');
+        switch (section) {
+          case 'IHDR':
+            this.width = this.readUInt32();
+            this.height = this.readUInt32();
+            this.bits = this.data[this.pos++];
+            this.colorType = this.data[this.pos++];
+            this.compressionMethod = this.data[this.pos++];
+            this.filterMethod = this.data[this.pos++];
+            this.interlaceMethod = this.data[this.pos++];
+            break;
+          case 'acTL':
+            this.animation = {
+              numFrames: this.readUInt32(),
+              numPlays: this.readUInt32() || Infinity,
+              frames: []
+            };
+            break;
+          case 'PLTE':
+            this.palette = this.read(chunkSize);
+            break;
+          case 'fcTL':
+            if (frame) {
+              this.animation.frames.push(frame);
+            }
+            this.pos += 4;
+            frame = {
+              width: this.readUInt32(),
+              height: this.readUInt32(),
+              xOffset: this.readUInt32(),
+              yOffset: this.readUInt32()
+            };
+            delayNum = this.readUInt16();
+            delayDen = this.readUInt16() || 100;
+            frame.delay = 1000 * delayNum / delayDen;
+            frame.disposeOp = this.data[this.pos++];
+            frame.blendOp = this.data[this.pos++];
+            frame.data = [];
+            break;
+          case 'IDAT':
+          case 'fdAT':
+            if (section === 'fdAT') {
+              this.pos += 4;
+              chunkSize -= 4;
+            }
+            data = (frame != null ? frame.data : void 0) || this.imgData;
+            for (i = _i = 0; 0 <= chunkSize ? _i < chunkSize : _i > chunkSize; i = 0 <= chunkSize ? ++_i : --_i) {
+              data.push(this.data[this.pos++]);
+            }
+            break;
+          case 'tRNS':
+            this.transparency = {};
+            switch (this.colorType) {
+              case 3:
+                this.transparency.indexed = this.read(chunkSize);
+                short = 255 - this.transparency.indexed.length;
+                if (short > 0) {
+                  for (i = _j = 0; 0 <= short ? _j < short : _j > short; i = 0 <= short ? ++_j : --_j) {
+                    this.transparency.indexed.push(255);
+                  }
+                }
+                break;
+              case 0:
+                this.transparency.grayscale = this.read(chunkSize)[0];
+                break;
+              case 2:
+                this.transparency.rgb = this.read(chunkSize);
+            }
+            break;
+          case 'tEXt':
+            text = this.read(chunkSize);
+            index = text.indexOf(0);
+            key = String.fromCharCode.apply(String, text.slice(0, index));
+            this.text[key] = String.fromCharCode.apply(String, text.slice(index + 1));
+            break;
+          case 'IEND':
+            if (frame) {
+              this.animation.frames.push(frame);
+            }
+            this.colors = (function() {
+              switch (this.colorType) {
+                case 0:
+                case 3:
+                case 4:
+                  return 1;
+                case 2:
+                case 6:
+                  return 3;
+              }
+            }).call(this);
+            this.hasAlphaChannel = (_ref = this.colorType) === 4 || _ref === 6;
+            colors = this.colors + (this.hasAlphaChannel ? 1 : 0);
+            this.pixelBitlength = this.bits * colors;
+            this.colorSpace = (function() {
+              switch (this.colors) {
+                case 1:
+                  return 'DeviceGray';
+                case 3:
+                  return 'DeviceRGB';
+              }
+            }).call(this);
+            this.imgData = new Uint8Array(this.imgData);
+            return;
+          default:
+            this.pos += chunkSize;
+        }
+        this.pos += 4;
+        if (this.pos > this.data.length) {
+          throw new Error("Incomplete or corrupt PNG file");
+        }
+      }
+      return;
+    }
+
+    PNG.prototype.read = function(bytes) {
+      var i, _i, _results;
+      _results = [];
+      for (i = _i = 0; 0 <= bytes ? _i < bytes : _i > bytes; i = 0 <= bytes ? ++_i : --_i) {
+        _results.push(this.data[this.pos++]);
+      }
+      return _results;
+    };
+
+    PNG.prototype.readUInt32 = function() {
+      var b1, b2, b3, b4;
+      b1 = this.data[this.pos++] << 24;
+      b2 = this.data[this.pos++] << 16;
+      b3 = this.data[this.pos++] << 8;
+      b4 = this.data[this.pos++];
+      return b1 | b2 | b3 | b4;
+    };
+
+    PNG.prototype.readUInt16 = function() {
+      var b1, b2;
+      b1 = this.data[this.pos++] << 8;
+      b2 = this.data[this.pos++];
+      return b1 | b2;
+    };
+
+    PNG.prototype.decodePixels = function(data) {
+		console.log("decodePixels");
+      var byte, c, col, i, left, length, p, pa, paeth, pb, pc, pixelBytes, pixels, pos, row, scanlineLength, upper, upperLeft, _i, _j, _k, _l, _m;
+      if (data == null) {
+        data = this.imgData;
+      }
+      if (data.length === 0) {
+        return new Uint8Array(0);
+      }
+      data = new FlateStream(data);
+      data = data.getBytes();
+      pixelBytes = this.pixelBitlength / 8;
+      scanlineLength = pixelBytes * this.width;
+      pixels = new Uint8Array(scanlineLength * this.height);
+      length = data.length;
+      row = 0;
+      pos = 0;
+      c = 0;
+      while (pos < length) {
+        switch (data[pos++]) {
+          case 0:
+            for (i = _i = 0; _i < scanlineLength; i = _i += 1) {
+              pixels[c++] = data[pos++];
+            }
+            break;
+          case 1:
+            for (i = _j = 0; _j < scanlineLength; i = _j += 1) {
+              byte = data[pos++];
+              left = i < pixelBytes ? 0 : pixels[c - pixelBytes];
+              pixels[c++] = (byte + left) % 256;
+            }
+            break;
+          case 2:
+            for (i = _k = 0; _k < scanlineLength; i = _k += 1) {
+              byte = data[pos++];
+              col = (i - (i % pixelBytes)) / pixelBytes;
+              upper = row && pixels[(row - 1) * scanlineLength + col * pixelBytes + (i % pixelBytes)];
+              pixels[c++] = (upper + byte) % 256;
+            }
+            break;
+          case 3:
+            for (i = _l = 0; _l < scanlineLength; i = _l += 1) {
+              byte = data[pos++];
+              col = (i - (i % pixelBytes)) / pixelBytes;
+              left = i < pixelBytes ? 0 : pixels[c - pixelBytes];
+              upper = row && pixels[(row - 1) * scanlineLength + col * pixelBytes + (i % pixelBytes)];
+              pixels[c++] = (byte + Math.floor((left + upper) / 2)) % 256;
+            }
+            break;
+          case 4:
+            for (i = _m = 0; _m < scanlineLength; i = _m += 1) {
+              byte = data[pos++];
+              col = (i - (i % pixelBytes)) / pixelBytes;
+              left = i < pixelBytes ? 0 : pixels[c - pixelBytes];
+              if (row === 0) {
+                upper = upperLeft = 0;
+              } else {
+                upper = pixels[(row - 1) * scanlineLength + col * pixelBytes + (i % pixelBytes)];
+                upperLeft = col && pixels[(row - 1) * scanlineLength + (col - 1) * pixelBytes + (i % pixelBytes)];
+              }
+              p = left + upper - upperLeft;
+              pa = Math.abs(p - left);
+              pb = Math.abs(p - upper);
+              pc = Math.abs(p - upperLeft);
+              if (pa <= pb && pa <= pc) {
+                paeth = left;
+              } else if (pb <= pc) {
+                paeth = upper;
+              } else {
+                paeth = upperLeft;
+              }
+              pixels[c++] = (byte + paeth) % 256;
+            }
+            break;
+          default:
+            throw new Error("Invalid filter algorithm: " + data[pos - 1]);
+        }
+        row++;
+      }
+      return pixels;
+    };
+
+    PNG.prototype.decodePalette = function() {
+      var c, i, length, palette, pos, ret, transparency, _i, _ref, _ref1;
+      palette = this.palette;
+      transparency = this.transparency.indexed || [];
+      ret = new Uint8Array((transparency.length || 0) + palette.length);
+      pos = 0;
+      length = palette.length;
+      c = 0;
+      for (i = _i = 0, _ref = palette.length; _i < _ref; i = _i += 3) {
+        ret[pos++] = palette[i];
+        ret[pos++] = palette[i + 1];
+        ret[pos++] = palette[i + 2];
+        ret[pos++] = (_ref1 = transparency[c++]) != null ? _ref1 : 255;
+      }
+      return ret;
+    };
+	PNG.prototype.getImageData = function() {
+		var imageData=new self.ImageData(this.width,this.height);
+		this.copyToImageData(imageData,this.decodePixels());
+		return imageData;
+	}
+	
+	PNG.prototype.getImageDataBuffer = function() {
+		var buffer=new self.Uint8ClampedArray(this.width*this.height*4);
+		//var imageData=new self.ImageData(this.width,this.height);
+		this.copyToImageData(buffer,this.decodePixels());
+		return buffer;
+	}
+
+    PNG.prototype.copyToImageData = function(imageData, pixels) {
+      var alpha, colors, data, i, input, j, k, length, palette, v, _ref;
+      colors = this.colors;
+      palette = null;
+      alpha = this.hasAlphaChannel;
+      if (this.palette.length) {
+        palette = (_ref = this._decodedPalette) != null ? _ref : this._decodedPalette = this.decodePalette();
+        colors = 4;
+        alpha = true;
+      }
+      data = imageData.data || imageData;
+      length = data.length;
+      input = palette || pixels;
+      i = j = 0;
+      if (colors === 1) {
+        while (i < length) {
+          k = palette ? pixels[i / 4] * 4 : j;
+          v = input[k++];
+          data[i++] = v;
+          data[i++] = v;
+          data[i++] = v;
+          data[i++] = alpha ? input[k++] : 255;
+          j = k;
+        }
+      } else {
+        while (i < length) {
+          k = palette ? pixels[i / 4] * 4 : j;
+          data[i++] = input[k++];
+          data[i++] = input[k++];
+          data[i++] = input[k++];
+          data[i++] = alpha ? input[k++] : 255;
+          j = k;
+        }
+      }
+    };
+
+    PNG.prototype.decode = function() {
+      var ret;
+      ret = new Uint8Array(this.width * this.height * 4);
+      this.copyToImageData(ret, this.decodePixels());
+      return ret;
+    };
+
+    
+
+    PNG.prototype.decodeFrames = function(ctx) {
+      var frame, i, imageData, pixels, _i, _len, _ref, _results;
+      if (!this.animation) {
+        return;
+      }
+      _ref = this.animation.frames;
+      _results = [];
+      for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+        frame = _ref[i];
+        imageData = ctx.createImageData(frame.width, frame.height);
+        pixels = this.decodePixels(new Uint8Array(frame.data));
+        this.copyToImageData(imageData, pixels);
+        frame.imageData = imageData;
+        _results.push(frame.image = makeImage(imageData));
+      }
+      return _results;
+    };
+
+
+    return PNG;
+
+  })();
+
+  this.PNG = PNG;
+
+}).call(this);
+
+
+onmessage =function (evt){
+  
+  var data = evt.data;//通过evt.data获得发送来的数据
+  switch(data.type)
+  {
+	  case "load":
+		  //loadImage(data);
+		  loadImage2(data);
+		  break;
+  }
+}
+var canUseImageData=false;
+testCanImageData();
+function testCanImageData()
+{
+	try
+	{
+		cc=new ImageData(20,20);
+		canUseImageData=true;
+	}catch(e)
+	{
+		
+	}
+	//canUseImageData=false;
+}
+function loadImage(data)
+{
+	PNG.load(data.url,pngLoaded);
+}
+function loadImage2(data)
+{
+	var url=data.url;
+	var xhr,
+    _this = this;
+      xhr = new XMLHttpRequest;
+      xhr.open("GET", url, true);
+	  //showMsgToMain("loadImage2");
+	  xhr.responseType = "arraybuffer";
+      
+      xhr.onload = function() {
+		var response=xhr.response || xhr.mozResponseArrayBuffer;
+		//showMsgToMain("onload:");
+		
+        var data, png;
+        data = new Uint8Array(response);
+		if(self.createImageBitmap)
+		{
+			doCreateImageBitmap(data,url);
+			return;
+		}
+		try
+		{
+			//new self.ImageData(22,22);
+			//new self.Uint8ClampedArray();
+			startTime=getTimeNow();
+			png = new PNG(data);
+		    png.url=url;
+			png.startTime=startTime;
+			png.decodeEndTime=getTimeNow();
+			png.decodeTime=png.decodeEndTime-startTime;
+      console.log("Decode By PNG.js,"+png.decodeTime,url);
+		    pngLoaded(png);
+		}catch(e)
+		{
+			pngFail(url,"parse fail"+e.toString()+":ya");
+		}
+        
+      };
+	  xhr.onerror = function(e){
+		pngFail(url,"loadFail");
+	}
+      xhr.send(null);
+}
+function doCreateImageBitmap(response,url)
+{
+	try
+	{
+		//showMsgToMain("hihidoCreateImageBitmap");
+		//showMsgToMain("doCreateImageBitmap:"+response);
+		var startTime=getTimeNow();
+		//showMsgToMain("new self.Blob");
+		response = new self.Blob([response],{type:"image/png"});
+		self.createImageBitmap(response).then(function(imageBitmap) {
+			//showMsgToMain("imageBitmapCreated:");
+			var data={};
+	        data.url=url;
+			data.imageBitmap=imageBitmap;
+			data.dataType="imageBitmap";
+			data.startTime=startTime;
+	    data.decodeTime=getTimeNow()-startTime;
+      console.log("Decode By createImageBitmap,"+data.decodeTime,url);
+			//data.sendTime=getTimeNow();
+			data.type="Image";
+			postMessage(data,[data.imageBitmap]);
+        }).catch(
+		function(e)
+		{
+			showMsgToMain("cache:"+e);
+			pngFail(url,"parse fail"+e+":ya");
+		}
+		)
+	}catch(e)
+	{
+		pngFail(url,"parse fail"+e.toString()+":ya");
+	}
+}
+function getTimeNow()
+{
+	return new Date().getTime();
+}
+function pngFail(url,msg)
+{
+	var data={};
+	data.url=url;
+	data.imagedata=null;
+	data.type="Image";
+	data.msg=msg;
+	console.log(msg);
+	postMessage(data);
+}
+function showMsgToMain(msg)
+{
+	var data={};
+	data.type="Msg";
+	data.msg=msg;
+	postMessage(data);
+}
+function pngLoaded(png)
+{
+	var data={};
+	data.url=png.url;
+	if(canUseImageData)
+	{
+		data.imagedata=png.getImageData();
+		data.dataType="imagedata";
+	}else
+	{
+		data.buffer=png.getImageDataBuffer();
+		data.dataType="buffer";
+	}
+	//
+	
+	data.width=png.width;
+	data.height=png.height;
+	//data.getBufferTime=getTimeNow()-png.decodeEndTime;
+	//data.startTime=png.startTime;
+	//data.decodeTime=png.decodeTime;
+	//data.sendTime=getTimeNow();
+	data.type="Image";
+	//debugger;
+	if(canUseImageData)
+	{
+		postMessage(data,[data.imagedata.data.buffer]);
+	}else
+	{
+		postMessage(data,[data.buffer.buffer]);
+	}
+	
+}
