@@ -25,6 +25,7 @@ var Game = (function () {
         Laya.stage.addChild(this.info);
         Laya.WorkerLoader.enable = true;
         this.initServiceWorker();
+        // this.serviceWorkerInited();
         //设置适配模式
         Laya.stage.scaleMode = "showall";
         //设置剧中对齐
@@ -53,10 +54,22 @@ var Game = (function () {
         else {
             this.info.text += "\ncreateImageBitmap:" + false;
         }
+        this.loadStartTime = Laya.Browser.now();
+        var urls;
+        urls = [];
+        urls.push({ url: "res/sound/bullet.mp3", type: Laya.Loader.SOUND });
+        urls.push({ url: "res/sound/enemy1_down.mp3", type: Laya.Loader.SOUND });
+        urls.push({ url: "res/sound/enemy2_down.mp3", type: Laya.Loader.SOUND });
+        urls.push({ url: "res/sound/enemy3_down.mp3", type: Laya.Loader.SOUND });
+        urls.push({ url: "res/sound/enemy3_out.mp3", type: Laya.Loader.SOUND });
+        urls.push({ url: "res/sound/achievement.mp3", type: Laya.Loader.SOUND });
+        urls.push({ url: "res/atlas/war.json", type: Laya.Loader.ATLAS });
+        urls.push({ url: "res/background.png", type: Laya.Loader.IMAGE });
         //加载图集资源
-        Laya.loader.load("res/atlas/war.json", Laya.Handler.create(this, this.onLoaded), null, Laya.Loader.ATLAS);
+        Laya.loader.load(urls, Laya.Handler.create(this, this.onLoaded), null);
     };
     Game.prototype.onLoaded = function () {
+        this.info.text += "\nLoadTime:" + (Laya.Browser.now() - this.loadStartTime);
         //创建循环滚动的背景
         var bg = new BackGround();
         //把背景添加到舞台上显示出来
