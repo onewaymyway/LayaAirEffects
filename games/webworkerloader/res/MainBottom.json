@@ -1,0 +1,243 @@
+{
+    "frames": {
+        "bgProgress.png": {
+            "frame": {
+                "x": 0,
+                "y": 0,
+                "w": 496,
+                "h": 30,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 496,
+                "h": 30
+            },
+            "sourceSize": {
+                "w": 496,
+                "h": 30
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "btn_MainBottom_bag.png": {
+            "frame": {
+                "x": 498,
+                "y": 0,
+                "w": 102,
+                "h": 204,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 102,
+                "h": 204
+            },
+            "sourceSize": {
+                "w": 102,
+                "h": 204
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "btn_MainBottom_equipment.png": {
+            "frame": {
+                "x": 0,
+                "y": 32,
+                "w": 102,
+                "h": 204,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 102,
+                "h": 204
+            },
+            "sourceSize": {
+                "w": 102,
+                "h": 204
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "btn_MainBottom_fromCity.png": {
+            "frame": {
+                "x": 104,
+                "y": 32,
+                "w": 160,
+                "h": 320,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 160,
+                "h": 320
+            },
+            "sourceSize": {
+                "w": 160,
+                "h": 320
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "btn_MainBottom_shop.png": {
+            "frame": {
+                "x": 266,
+                "y": 32,
+                "w": 160,
+                "h": 320,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 160,
+                "h": 320
+            },
+            "sourceSize": {
+                "w": 160,
+                "h": 320
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "btn_MainBottom_skill.png": {
+            "frame": {
+                "x": 0,
+                "y": 238,
+                "w": 102,
+                "h": 204,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 102,
+                "h": 204
+            },
+            "sourceSize": {
+                "w": 102,
+                "h": 204
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "btn_MainBottom_task.png": {
+            "frame": {
+                "x": 428,
+                "y": 206,
+                "w": 102,
+                "h": 204,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 102,
+                "h": 204
+            },
+            "sourceSize": {
+                "w": 102,
+                "h": 204
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "btn_MainBottom_toCity.png": {
+            "frame": {
+                "x": 532,
+                "y": 206,
+                "w": 160,
+                "h": 320,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 160,
+                "h": 320
+            },
+            "sourceSize": {
+                "w": 160,
+                "h": 320
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "exp_max.png": {
+            "frame": {
+                "x": 602,
+                "y": 0,
+                "w": 69,
+                "h": 38,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 69,
+                "h": 38
+            },
+            "sourceSize": {
+                "w": 69,
+                "h": 38
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "Main_bottom_bg.png": {
+            "frame": {
+                "x": 0,
+                "y": 528,
+                "w": 574,
+                "h": 140,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 574,
+                "h": 140
+            },
+            "sourceSize": {
+                "w": 574,
+                "h": 140
+            },
+            "rotated": false,
+            "trimed": false
+        },
+        "progressExp.png": {
+            "frame": {
+                "x": 0,
+                "y": 444,
+                "w": 496,
+                "h": 30,
+                "idx": 0
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 496,
+                "h": 30
+            },
+            "sourceSize": {
+                "w": 496,
+                "h": 30
+            },
+            "rotated": false,
+            "trimed": false
+        }
+    },
+    "meta": {
+        "app": "http:\/\/www.layabox.com",
+        "version": "0.1.0 alpha",
+        "format": "json",
+        "scale": 1,
+        "image": "MainBottom.png",
+        "prefix": "MainBottom\/"
+    }
+}
