@@ -923,7 +923,7 @@ function loadImage2(data)
 			png.startTime=startTime;
 			png.decodeEndTime=getTimeNow();
 			png.decodeTime=png.decodeEndTime-startTime;
-      console.log("Decode By PNG.js,"+png.decodeTime,url);
+      // console.log("Decode By PNG.js,"+png.decodeTime,url);
 		    pngLoaded(png);
 		}catch(e)
 		{
@@ -960,7 +960,7 @@ function doCreateImageBitmap(response,url)
         }).catch(
 		function(e)
 		{
-			showMsgToMain("cache:"+e);
+			showMsgToMain("catch:"+e);
 			pngFail(url,"parse fail"+e+":ya");
 		}
 		)
@@ -1011,6 +1011,7 @@ function pngLoaded(png)
 	//data.startTime=png.startTime;
 	//data.decodeTime=png.decodeTime;
 	//data.sendTime=getTimeNow();
+   console.log("Decode By PNG.js,"+(getTimeNow()-png.startTime),png.url);
 	data.type="Image";
 	//debugger;
 	if(canUseImageData)
