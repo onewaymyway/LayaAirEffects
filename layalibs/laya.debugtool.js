@@ -13,7 +13,7 @@
 	var ResourceManager=laya.resource.ResourceManager,RunDriver=laya.utils.RunDriver,Sprite=laya.display.Sprite;
 	var Stage=laya.display.Stage,Stat=laya.utils.Stat,Style=laya.display.css.Style,Text=laya.display.Text,TextInput=laya.ui.TextInput;
 	var Texture=laya.resource.Texture,Timer=laya.utils.Timer,Tree=laya.ui.Tree,UIEvent=laya.ui.UIEvent,URL=laya.net.URL;
-	var Utils=laya.utils.Utils,View=laya.ui.View,WebGL=laya.webgl.WebGL;
+	var Utils=laya.utils.Utils,View=laya.ui.View;
 	//class laya.debug.data.Base64AtlasManager
 	var Base64AtlasManager=(function(){
 		function Base64AtlasManager(){}
@@ -7629,10 +7629,10 @@
 	})()
 
 
+	//import laya.webgl.WebGL;
 	//class Main
 	var Main=(function(){
 		function Main(){
-			WebGL.enable();
 			Laya.init(900,900);
 			Laya.stage.bgColor="#ffff00";
 			Font.defaultFamily="Arial";
@@ -11948,6 +11948,26 @@
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
+	var NodeTreeSetting=(function(_super){
+		function NodeTreeSetting(){
+			NodeTreeSetting.__super.call(this);
+			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
+			this.createView(NodeTreeSettingUI.uiView);
+		}
+
+		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
+		var __proto=NodeTreeSetting.prototype;
+		//inits();
+		__proto.createChildren=function(){}
+		return NodeTreeSetting;
+	})(NodeTreeSettingUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.NodeTree extends laya.debug.ui.debugui.NodeTreeUI
 	var NodeTree=(function(_super){
 		function NodeTree(){
@@ -12185,26 +12205,6 @@
 		]);
 		return NodeTree;
 	})(NodeTreeUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
-	var NodeTreeSetting=(function(_super){
-		function NodeTreeSetting(){
-			NodeTreeSetting.__super.call(this);
-			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
-			this.createView(NodeTreeSettingUI.uiView);
-		}
-
-		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
-		var __proto=NodeTreeSetting.prototype;
-		//inits();
-		__proto.createChildren=function(){}
-		return NodeTreeSetting;
-	})(NodeTreeSettingUI)
 
 
 	/**
