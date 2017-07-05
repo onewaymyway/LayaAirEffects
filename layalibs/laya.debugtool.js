@@ -3567,24 +3567,33 @@
 		}
 
 		GetSetProfile.showInfo=function(){
+			var rstO;
+			rstO={};
 			var className;
 			var keyName;
 			var type;
 			for (className in GetSetProfile.infoDic){
 				var tClassO;
+				var tClassO1;
 				tClassO=GetSetProfile.infoDic[className];
+				rstO[className]=tClassO1={};
 				for (keyName in tClassO){
 					var tKeyO;
+					var tKeyO1;
 					tKeyO=tClassO[keyName];
+					tClassO1[keyName]=tKeyO1={};
 					for(type in tKeyO){
 						var tDataO;
+						var tDataO1;
 						tDataO=tKeyO[type];
 						tDataO["rate"]=tDataO["objCount"] / GetSetProfile.getClassCount(className);
+						tKeyO1[type]=tDataO["rate"];
 					}
 				}
 			}
 			console.log(GetSetProfile.infoDic);
 			console.log(GetSetProfile.countDic);
+			console.log(rstO);
 		}
 
 		GetSetProfile.hookVar=function(obj,name,setHook,getHook){
