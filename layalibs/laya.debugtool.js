@@ -3610,7 +3610,7 @@
 			var tArr;
 			for (i=0;i < len;i++){
 				tArr=arr[i];
-				console.log(tArr[0],tArr[1]);
+				console.log(tArr[0],Math.floor(tArr[1]*100));
 			}
 		}
 
