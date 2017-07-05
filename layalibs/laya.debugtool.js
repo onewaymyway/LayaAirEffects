@@ -3438,7 +3438,7 @@
 				return;
 			GetSetProfile._inited=true;
 			var createFun=function (sp){
-				GetSetProfile.classCreated(sp,/*no*/this.clz);
+				GetSetProfile.classCreated(sp);
 			}
 			FunHook.hook(Node,"call",null,createFun);
 			GetSetProfile.handlerO={};
@@ -3455,7 +3455,6 @@
 		GetSetProfile.classCreated=function(obj,oClas){
 			if (GetSetProfile.fromMe)
 				return;
-			/*no*/this.allNodeCount++;
 			var className;
 			className=ClassTool.getClassName(obj);
 			GetSetProfile.addClassCount(className);
@@ -3571,6 +3570,8 @@
 			rstO={};
 			var rstO1;
 			rstO1={};
+			var arr;
+			arr=[];
 			var className;
 			var keyName;
 			var type;
@@ -3590,7 +3591,12 @@
 						tDataO=tKeyO[type];
 						tDataO["rate"]=tDataO["objCount"] / GetSetProfile.getClassCount(className);
 						tKeyO1[type]=tDataO["rate"];
-						rstO1[className+"_"+keyName+"_"+type]=tDataO["rate"];
+						var tSKey;
+						tSKey=className+"_"+keyName+"_"+type;
+						rstO1[tSKey]=tDataO["rate"];
+						if (className=="ALL"){
+							arr.push([tSKey,tDataO["rate"]]);
+						}
 					}
 				}
 			}
@@ -3598,6 +3604,14 @@
 			console.log(GetSetProfile.countDic);
 			console.log(rstO);
 			console.log(rstO1);
+			arr.sort(MathUtil.sortByKey("1",true,true));
+			var i=0,len=0;
+			len=arr.length;
+			var tArr;
+			for (i=0;i < len;i++){
+				tArr=arr[i];
+				console.log(tArr[0],tArr[1]);
+			}
 		}
 
 		GetSetProfile.hookVar=function(obj,name,setHook,getHook){
