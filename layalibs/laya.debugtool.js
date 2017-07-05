@@ -3569,6 +3569,8 @@
 		GetSetProfile.showInfo=function(){
 			var rstO;
 			rstO={};
+			var rstO1;
+			rstO1={};
 			var className;
 			var keyName;
 			var type;
@@ -3588,12 +3590,14 @@
 						tDataO=tKeyO[type];
 						tDataO["rate"]=tDataO["objCount"] / GetSetProfile.getClassCount(className);
 						tKeyO1[type]=tDataO["rate"];
+						rstO1[className+"_"+keyName+"_"+type]=tDataO["rate"];
 					}
 				}
 			}
 			console.log(GetSetProfile.infoDic);
 			console.log(GetSetProfile.countDic);
 			console.log(rstO);
+			console.log(rstO1);
 		}
 
 		GetSetProfile.hookVar=function(obj,name,setHook,getHook){
