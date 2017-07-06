@@ -3572,6 +3572,8 @@
 			rstO1={};
 			var arr;
 			arr=[];
+			var arr1;
+			arr1=[];
 			var className;
 			var keyName;
 			var type;
@@ -3595,7 +3597,11 @@
 						tSKey=className+"_"+keyName+"_"+type;
 						rstO1[tSKey]=tDataO["rate"];
 						if (className=="ALL"){
-							arr.push([tSKey,tDataO["rate"]]);
+							if (type=="get"){
+								arr.push([tSKey,tDataO["rate"]]);
+								}else{
+								arr1.push([tSKey,tDataO["rate"]]);
+							}
 						}
 					}
 				}
@@ -3604,6 +3610,13 @@
 			console.log(GetSetProfile.countDic);
 			console.log(rstO);
 			console.log(rstO1);
+			console.log("get:");
+			GetSetProfile.showStaticArray(arr);
+			console.log("set:");
+			GetSetProfile.showStaticArray(arr1);
+		}
+
+		GetSetProfile.showStaticArray=function(arr){
 			arr.sort(MathUtil.sortByKey("1",true,true));
 			var i=0,len=0;
 			len=arr.length;
