@@ -3611,14 +3611,22 @@
 			console.log(rstO);
 			console.log(rstO1);
 			console.log("nodeCount:",GetSetProfile.getClassCount("ALL"));
-			console.log("get:");
-			GetSetProfile.showStaticArray(arr);
-			console.log("set:");
-			GetSetProfile.showStaticArray(arr1);
+			console.log("sort by rate");
+			GetSetProfile.showStaticInfo(arr,arr1,"1");
+			console.log("sort by count");
+			GetSetProfile.showStaticInfo(arr,arr1,"2");
 		}
 
-		GetSetProfile.showStaticArray=function(arr){
-			arr.sort(MathUtil.sortByKey("1",true,true));
+		GetSetProfile.showStaticInfo=function(arr,arr1,sortKey){
+			console.log("get:");
+			GetSetProfile.showStaticArray(arr,sortKey);
+			console.log("set:");
+			GetSetProfile.showStaticArray(arr1,sortKey);
+		}
+
+		GetSetProfile.showStaticArray=function(arr,sortKey){
+			(sortKey===void 0)&& (sortKey="1");
+			arr.sort(MathUtil.sortByKey(sortKey,true,true));
 			var i=0,len=0;
 			len=arr.length;
 			var tArr;
