@@ -3598,9 +3598,9 @@
 						rstO1[tSKey]=tDataO["rate"];
 						if (className=="ALL"){
 							if (type=="get"){
-								arr.push([tSKey,tDataO["rate"]]);
+								arr.push([tSKey,tDataO["rate"],tDataO["count"]]);
 								}else{
-								arr1.push([tSKey,tDataO["rate"]]);
+								arr1.push([tSKey,tDataO["rate"],tDataO["count"]]);
 							}
 						}
 					}
@@ -3610,6 +3610,7 @@
 			console.log(GetSetProfile.countDic);
 			console.log(rstO);
 			console.log(rstO1);
+			console.log("nodeCount:",GetSetProfile.getClassCount("ALL"));
 			console.log("get:");
 			GetSetProfile.showStaticArray(arr);
 			console.log("set:");
@@ -3623,7 +3624,7 @@
 			var tArr;
 			for (i=0;i < len;i++){
 				tArr=arr[i];
-				console.log(tArr[0],Math.floor(tArr[1]*100));
+				console.log(tArr[0],Math.floor(tArr[1]*100),tArr[2]);
 			}
 		}
 
